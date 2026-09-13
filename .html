@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar - Roblox Revival</title>
+    <style>
+        /* 2019 Roblox Aesthetic */
+        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        body {
+            background-color: #f2f4f5;
+            color: #393b3d;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background-color: #232527;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .logo {
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: 1px;
+            margin-right: 30px;
+            cursor: pointer;
+        }
+
+        .search-bar {
+            background-color: white;
+            border-radius: 4px;
+            padding: 4px 10px;
+            width: 400px;
+            display: flex;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            margin-top: 40px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 180px;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 8px 20px;
+            font-size: 16px;
+            color: #393b3d;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .sidebar li:hover {
+            background-color: #e3e6e8;
+        }
+
+        .sidebar li.active {
+            font-weight: bold;
+            border-left: 4px solid #000;
+            background-color: #e3e6e8;
+        }
+
+        /* Content Area */
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .avatar-editor {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Left Column: Avatar Preview */
+        .avatar-preview-container {
+            width: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: center;
+            height: fit-content;
+        }
+
+        .avatar-image {
+            width: 200px;
+            height: 200px;
+            background-color: #e1e3e5; /* Base grey background */
+            margin: 0 auto 20px auto;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Layering elements directly on top of each other */
+        .avatar-image .base-body { position: absolute; width: 100%; height: 100%; z-index: 1;}
+        .avatar-image .face-overlay { position: absolute; width: 120px; height: 120px; top: 30px; z-index: 2; object-fit: contain; }
+        .avatar-image .hat-overlay { position: absolute; width: 140px; height: 140px; top: -10px; z-index: 3; object-fit: contain; }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 18px;
+            text-align: left;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e1e3e5;
+            padding-bottom: 5px;
+        }
+
+        .equipped-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Right Column: Wardrobe */
+        .wardrobe-container {
+            flex-grow: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 20px;
+            border-bottom: 1px solid #e1e3e5;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 0;
+            cursor: pointer;
+            font-weight: 600;
+            color: #757b7f;
+        }
+
+        .tab.active {
+            color: #393b3d;
+            border-bottom: 3px solid #00a2ff;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 15px;
+        }
+
+        .item-card {
+            border: 1px solid #e1e3e5;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .item-card.equipped {
+            border: 2px solid #00a2ff;
+            background-color: #f0f8ff;
+        }
+
+        .item-card .equipped-check {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #00a2ff;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .item-card.equipped .equipped-check {
+            display: flex;
+        }
+
+        .item-image {
+            width: 70px;
+            height: 70px;
+            background: #f2f4f5;
+            margin: 0 auto 10px auto;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .item-name {
+            font-size: 12px;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 2019 Topbar -->
+    <div class="navbar">
+        <div class="logo">ROBLOX</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search">
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 2019 Left Sidebar -->
+        <div class="sidebar">
+            <ul>
+                <li>Home</li>
+                <li>Profile</li>
+                <li>Messages</li>
+                <li>Friends</li>
+                <li class="active">Avatar</li>
+                <li>Inventory</li>
+                <li>Trade</li>
+                <li>Groups</li>
+            </ul>
+        </div>
+
+        <!-- Main Avatar Area -->
+        <div class="content">
+            <div class="page-title">Avatar Editor</div>
+            
+            <div class="avatar-editor">
+                <!-- Left: Preview & Equipped Items -->
+                <div class="avatar-preview-container">
+                    <div class="avatar-image">
+                        <!-- We use an empty div as a "body" placeholder for now -->
+                        <div id="render-body" class="base-body" style="background-color: #f1c27d; border-radius: 20px; margin-top: 40px; height: 160px; width: 120px;"></div>
+                        <div id="render-face" class="face-overlay"></div>
+                        <div id="render-hat" class="hat-overlay"></div>
+                    </div>
+                    
+                    <div class="section-title">Currently Equipped</div>
+                    <div class="equipped-list" id="equipped-container">
+                        <!-- Equipped items render here -->
+                    </div>
+                </div>
+
+                <!-- Right: Wardrobe / Catalog Items -->
+                <div class="wardrobe-container">
+                    <div class="tabs">
+                        <div class="tab active" onclick="filterItems('All')">Recent</div>
+                        <div class="tab" onclick="filterItems('Hat')">Hats</div>
+                        <div class="tab" onclick="filterItems('Face')">Faces</div>
+                    </div>
+
+                    <div class="inventory-grid" id="inventory-container">
+                        <!-- JS injects items here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MOCK DATABASE USING REAL IMAGE URLs
+        const inventory = [
+            { 
+                id: 1, 
+                name: 'Chill', 
+                type: 'Face', 
+                imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSP3Asn0-iAm74h4Ioz0Be2Ocj02C-98xFxO6zj6bf5lg&s' 
+            },
+            { 
+                id: 2, 
+                name: 'Winning Smile', 
+                type: 'Face', 
+                imageUrl: 'https://tr.rbxcdn.com/f047df125ce0970a04da288f63567786/420/420/Face/Png' 
+            },
+            { 
+                id: 3, 
+                name: 'Custom Hat', 
+                type: 'Hat', 
+                // HERE IS YOUR NEW HAT LINK!
+                imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnyDb6rYZoP6OixE0RnnrTdmbCzVj6kMY3zkwtFnr_5w&s' 
+            },
+            { 
+                id: 4, 
+                name: 'Red Baseball Cap', 
+                type: 'Hat', 
+                imageUrl: 'https://tr.rbxcdn.com/ea6014e04ed9f94a61cb3c13a69622d7/420/420/Hat/Png' 
+            }
+        ];
+
+        // State: Holds IDs of equipped items (1 = Chill, 3 = Custom Hat)
+        let equippedItemIds = [1, 3]; 
+        let currentFilter = 'All';
+
+        // Initialize the page
+        function init() {
+            renderInventory();
+            renderEquipped();
+            updateAvatarRender();
+        }
+
+        // Toggle equipping/unequipping items
+        function toggleEquip(id) {
+            const index = equippedItemIds.indexOf(id);
+            const item = inventory.find(i => i.id === id);
+
+            if (index > -1) {
+                // Item is equipped, unequip it
+                equippedItemIds.splice(index, 1);
+            } else {
+                // Rule: If it's a Hat or Face, unequip the old one first
+                if (item.type === 'Face' || item.type === 'Hat') {
+                    equippedItemIds = equippedItemIds.filter(eqId => {
+                        let eqItem = inventory.find(i => i.id === eqId);
+                        return eqItem.type !== item.type;
+                    });
+                }
+                // Equip the new item
+                equippedItemIds.push(id);
+            }
+            
+            renderInventory();
+            renderEquipped();
+            updateAvatarRender();
+        }
+
+        // Render the main grid
+        function renderInventory() {
+            const container = document.getElementById('inventory-container');
+            container.innerHTML = '';
+
+            const filteredItems = currentFilter === 'All' 
+                ? inventory 
+                : inventory.filter(item => item.type === currentFilter);
+
+            filteredItems.forEach(item => {
+                const isEquipped = equippedItemIds.includes(item.id);
+                
+                const card = document.createElement('div');
+                card.className = `item-card ${isEquipped ? 'equipped' : ''}`;
+                card.onclick = () => toggleEquip(item.id);
+
+                // Insert the real image from the URL
+                card.innerHTML = `
+                    <div class="equipped-check">✓</div>
+                    <div class="item-image">
+                        <img src="${item.imageUrl}" alt="${item.name}">
+                    </div>
+                    <div class="item-name" title="${item.name}">${item.name}</div>
+                    <div style="font-size: 10px; color: #757b7f; margin-top: 4px;">${item.type}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Render the "Currently Equipped" section on the left
+        function renderEquipped() {
+            const container = document.getElementById('equipped-container');
+            container.innerHTML = '';
+
+            if(equippedItemIds.length === 0) {
+                container.innerHTML = '<span style="font-size: 12px; color: #757b7f;">Nothing equipped.</span>';
+                return;
+            }
+
+            equippedItemIds.forEach(id => {
+                const item = inventory.find(i => i.id === id);
+                const itemDiv = document.createElement('div');
+                itemDiv.style = "border: 1px solid #e1e3e5; border-radius: 4px; padding: 5px; width: 60px; text-align: center; cursor: pointer; background: white;";
+                itemDiv.onclick = () => toggleEquip(item.id); // Click to unequip
+                
+                itemDiv.innerHTML = `
+                    <div style="width: 48px; height: 48px; margin: 0 auto; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <img src="${item.imageUrl}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div style="font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px;">${item.name}</div>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        // Update the visual character preview
+        function updateAvatarRender() {
+            const faceRender = document.getElementById('render-face');
+            const hatRender = document.getElementById('render-hat');
+            
+            // Reset renders
+            faceRender.innerHTML = '';
+            hatRender.innerHTML = '';
+
+            equippedItemIds.forEach(id => {
+                const item = inventory.find(i => i.id === id);
+                // Layer the images directly onto the preview canvas
+                if (item.type === 'Face') {
+                    faceRender.innerHTML = `<img src="${item.imageUrl}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                }
+                if (item.type === 'Hat') {
+                    hatRender.innerHTML = `<img src="${item.imageUrl}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                }
+            });
+        }
+
+        // Tab Filtering logic
+        function filterItems(type) {
+            currentFilter = type;
+            
+            // Update UI tabs visually
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            renderInventory();
+        }
+
+        // Run on load
+        window.onload = init;
+    </script>
+</body>
+</html>
